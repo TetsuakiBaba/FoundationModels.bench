@@ -1,0 +1,4 @@
+{"id":"ex-add","category":"custom","prompt":"What is 2+2? Answer with just the number.","check":{"type":"number","value":4,"tolerance":0}}
+{"id":"ex-ok","category":"custom","prompt":"Reply with OK only.","check":{"type":"exact","values":["OK"]}}
+{"id":"ex-ja","category":"custom","instructions":"Always answer in Japanese.","prompt":"Say hello.","check":{"type":"contains","values":["こんにちは","ハロー","やあ"]}}
+{"id":"ex-json","category":"custom","prompt":"Give me the capital of Japan as JSON with keys city and country only.","check":{"type":"all","checks":[{"type":"jsonKeys","keys":["city","country"]},{"type":"contains","values":["Tokyo"]}]}}

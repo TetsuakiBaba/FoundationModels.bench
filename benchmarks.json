@@ -1,0 +1,980 @@
+{
+  "entries": [
+    {
+      "benchmarks": {
+        "accuracy": {
+          "options": {
+            "guardrails": "default",
+            "sampling": "default",
+            "useCase": "general"
+          },
+          "recordedAt": "2026-09-10T23:25:43Z",
+          "result": {
+            "categories": [
+              {
+                "accuracy": 1,
+                "category": "classification",
+                "latency_s_mean": 6.4588271832,
+                "tasks": 5
+              },
+              {
+                "accuracy": 1,
+                "category": "code",
+                "latency_s_mean": 2.5524764166666665,
+                "tasks": 3
+              },
+              {
+                "accuracy": 1,
+                "category": "extraction",
+                "latency_s_mean": 5.612380792,
+                "tasks": 3
+              },
+              {
+                "accuracy": 1,
+                "category": "instruction",
+                "latency_s_mean": 6.583334402833334,
+                "tasks": 6
+              },
+              {
+                "accuracy": 1,
+                "category": "japanese",
+                "latency_s_mean": 7.792096555666666,
+                "tasks": 3
+              },
+              {
+                "accuracy": 1,
+                "category": "knowledge",
+                "latency_s_mean": 6.455461866799999,
+                "tasks": 5
+              },
+              {
+                "accuracy": 0.8,
+                "category": "math",
+                "latency_s_mean": 5.3253609666,
+                "tasks": 5
+              },
+              {
+                "accuracy": 0.5,
+                "category": "reasoning",
+                "latency_s_mean": 4.870509177,
+                "tasks": 4
+              },
+              {
+                "accuracy": 1,
+                "category": "summarization",
+                "latency_s_mean": 3.701890167,
+                "tasks": 1
+              },
+              {
+                "accuracy": 0.6666666666666666,
+                "category": "translation",
+                "latency_s_mean": 8.551848916666668,
+                "tasks": 3
+              }
+            ],
+            "options": {
+              "guardrails": "default",
+              "sampling": "default",
+              "useCase": "general"
+            },
+            "overallAccuracy": 0.8947368421052632,
+            "responseTokens": 256,
+            "runs": 1,
+            "taskCount": 38,
+            "tasks": [
+              {
+                "category": "math",
+                "check": "last number = 391.0 ±0.0",
+                "errors": [],
+                "id": "math-mul",
+                "latency_s_mean": 3.45842975,
+                "outputs": [
+                  "391"
+                ],
+                "score": 1
+              },
+              {
+                "category": "math",
+                "check": "last number = 6912.0 ±0.0",
+                "errors": [],
+                "id": "math-add",
+                "latency_s_mean": 3.716479417,
+                "outputs": [
+                  "1234 + 5678 = 6912"
+                ],
+                "score": 1
+              },
+              {
+                "category": "math",
+                "check": "last number = 30.0 ±0.01",
+                "errors": [],
+                "id": "math-percent",
+                "latency_s_mean": 3.440946833,
+                "outputs": [
+                  "10"
+                ],
+                "score": 0
+              },
+              {
+                "category": "math",
+                "check": "last number = 12.0 ±0.0",
+                "errors": [],
+                "id": "math-sqrt",
+                "latency_s_mean": 6.443272125,
+                "outputs": [
+                  "12"
+                ],
+                "score": 1
+              },
+              {
+                "category": "math",
+                "check": "last number = 150.0 ±0.01",
+                "errors": [],
+                "id": "math-speed",
+                "latency_s_mean": 9.567676708,
+                "outputs": [
+                  "150"
+                ],
+                "score": 1
+              },
+              {
+                "category": "knowledge",
+                "check": "contains any of [\"Canberra\"]",
+                "errors": [],
+                "id": "know-capital",
+                "latency_s_mean": 6.458682209,
+                "outputs": [
+                  "Canberra"
+                ],
+                "score": 1
+              },
+              {
+                "category": "knowledge",
+                "check": "contains any of [\"Austen\"]",
+                "errors": [],
+                "id": "know-author",
+                "latency_s_mean": 6.478788458,
+                "outputs": [
+                  "Jane Austen"
+                ],
+                "score": 1
+              },
+              {
+                "category": "knowledge",
+                "check": "exactly 'Au'",
+                "errors": [],
+                "id": "know-chem",
+                "latency_s_mean": 6.4329905,
+                "outputs": [
+                  "Au"
+                ],
+                "score": 1
+              },
+              {
+                "category": "knowledge",
+                "check": "last number = 8.0 ±0.0",
+                "errors": [],
+                "id": "know-planets",
+                "latency_s_mean": 6.456967917,
+                "outputs": [
+                  "8"
+                ],
+                "score": 1
+              },
+              {
+                "category": "knowledge",
+                "check": "contains any of [\"富士\", \"Fuji\"]",
+                "errors": [],
+                "id": "know-ja-mountain",
+                "latency_s_mean": 6.44988025,
+                "outputs": [
+                  "富士山"
+                ],
+                "score": 1
+              },
+              {
+                "category": "reasoning",
+                "check": "contains any of [\"Bob\"]",
+                "errors": [],
+                "id": "reason-order",
+                "latency_s_mean": 6.440250166,
+                "outputs": [
+                  "Bob"
+                ],
+                "score": 1
+              },
+              {
+                "category": "reasoning",
+                "check": "matches /^\\W*yes/",
+                "errors": [
+                  "guardrailViolation: Detected content likely to be unsafe"
+                ],
+                "id": "reason-syllogism",
+                "latency_s_mean": 0.146794458,
+                "outputs": [
+                  ""
+                ],
+                "score": 0
+              },
+              {
+                "category": "reasoning",
+                "check": "last number = 6.0 ±0.0",
+                "errors": [],
+                "id": "reason-apples",
+                "latency_s_mean": 6.4389724170000004,
+                "outputs": [
+                  "4"
+                ],
+                "score": 0
+              },
+              {
+                "category": "reasoning",
+                "check": "contains any of [\"Wednesday\"]",
+                "errors": [],
+                "id": "reason-weekday",
+                "latency_s_mean": 6.456019667,
+                "outputs": [
+                  "Wednesday"
+                ],
+                "score": 1
+              },
+              {
+                "category": "instruction",
+                "check": "exactly 'OK'",
+                "errors": [],
+                "id": "inst-ok",
+                "latency_s_mean": 6.4658581250000005,
+                "outputs": [
+                  "OK"
+                ],
+                "score": 1
+              },
+              {
+                "category": "instruction",
+                "check": "matches /^\\s*[a-z]+,\\s?[a-z]+,\\s?(and )?[a-z]+\\.?\\s*$/",
+                "errors": [],
+                "id": "inst-fruits",
+                "latency_s_mean": 6.568674792,
+                "outputs": [
+                  "apple, banana, orange"
+                ],
+                "score": 1
+              },
+              {
+                "category": "instruction",
+                "check": "exactly 'HELLO'",
+                "errors": [],
+                "id": "inst-upper",
+                "latency_s_mean": 6.447002833,
+                "outputs": [
+                  "HELLO"
+                ],
+                "score": 1
+              },
+              {
+                "category": "instruction",
+                "check": "JSON with keys [\"city\", \"country\"] AND contains any of [\"Paris\"]",
+                "errors": [],
+                "id": "inst-json",
+                "latency_s_mean": 6.829648875,
+                "outputs": [
+                  "```json\n{\n  \"city\": \"Paris\",\n  \"country\": \"France\"\n}\n```"
+                ],
+                "score": 1
+              },
+              {
+                "category": "instruction",
+                "check": "exactly 'cba'",
+                "errors": [],
+                "id": "inst-reverse",
+                "latency_s_mean": 6.56614825,
+                "outputs": [
+                  "cba"
+                ],
+                "score": 1
+              },
+              {
+                "category": "instruction",
+                "check": "exactly '1 2 3 4 5'",
+                "errors": [],
+                "id": "inst-count",
+                "latency_s_mean": 6.622673542,
+                "outputs": [
+                  "1 2 3 4 5"
+                ],
+                "score": 1
+              },
+              {
+                "category": "classification",
+                "check": "contains any of [\"positive\"]",
+                "errors": [],
+                "id": "class-pos",
+                "latency_s_mean": 3.397308958,
+                "outputs": [
+                  "Positive"
+                ],
+                "score": 1
+              },
+              {
+                "category": "classification",
+                "check": "contains any of [\"negative\"]",
+                "errors": [],
+                "id": "class-neg",
+                "latency_s_mean": 9.4809815,
+                "outputs": [
+                  "Negative"
+                ],
+                "score": 1
+              },
+              {
+                "category": "classification",
+                "check": "contains any of [\"French\"]",
+                "errors": [],
+                "id": "class-lang",
+                "latency_s_mean": 6.463652041,
+                "outputs": [
+                  "French"
+                ],
+                "score": 1
+              },
+              {
+                "category": "classification",
+                "check": "matches /^\\W*spam/",
+                "errors": [],
+                "id": "class-spam",
+                "latency_s_mean": 6.574833417,
+                "outputs": [
+                  "**Spam**"
+                ],
+                "score": 1
+              },
+              {
+                "category": "extraction",
+                "check": "exactly 'support@example.com'",
+                "errors": [],
+                "id": "extract-email",
+                "latency_s_mean": 6.484478208,
+                "outputs": [
+                  "support@example.com"
+                ],
+                "score": 1
+              },
+              {
+                "category": "extraction",
+                "check": "contains any of [\"2024-03-05\"]",
+                "errors": [],
+                "id": "extract-date",
+                "latency_s_mean": 6.599922959,
+                "outputs": [
+                  "2024-03-05"
+                ],
+                "score": 1
+              },
+              {
+                "category": "extraction",
+                "check": "contains all of [\"yamada\", \"age=34\", \"osaka\"]",
+                "errors": [],
+                "id": "extract-person-generable",
+                "latency_s_mean": 3.752741209,
+                "outputs": [
+                  "name=Taro Yamada;age=34;city=Osaka"
+                ],
+                "score": 1
+              },
+              {
+                "category": "classification",
+                "check": "contains any of [\"neutral\"]",
+                "errors": [],
+                "id": "class-sentiment-generable",
+                "latency_s_mean": 6.37736,
+                "outputs": [
+                  "neutral"
+                ],
+                "score": 1
+              },
+              {
+                "category": "translation",
+                "check": "contains any of [\"おはよう\"]",
+                "errors": [],
+                "id": "trans-en-ja",
+                "latency_s_mean": 9.497617333,
+                "outputs": [
+                  "こんにちは"
+                ],
+                "score": 0
+              },
+              {
+                "category": "translation",
+                "check": "contains any of [\"thank\"]",
+                "errors": [],
+                "id": "trans-ja-en",
+                "latency_s_mean": 9.543453417,
+                "outputs": [
+                  "Thank you."
+                ],
+                "score": 1
+              },
+              {
+                "category": "translation",
+                "check": "contains any of [\"chats\"]",
+                "errors": [],
+                "id": "trans-en-fr",
+                "latency_s_mean": 6.614476,
+                "outputs": [
+                  "Je suis amoureux des chats."
+                ],
+                "score": 1
+              },
+              {
+                "category": "japanese",
+                "check": "contains any of [\"cat\"]",
+                "errors": [],
+                "id": "ja-word",
+                "latency_s_mean": 9.498819709,
+                "outputs": [
+                  "cat"
+                ],
+                "score": 1
+              },
+              {
+                "category": "japanese",
+                "check": "contains any of [\"雷雨\", \"雷\", \"嵐\", \"雨\"] AND contains any of [\"電車\", \"運転\", \"交通\", \"列車\"]",
+                "errors": [],
+                "id": "ja-summary",
+                "latency_s_mean": 10.036732375,
+                "outputs": [
+                  "東京で大きな雷雨により多くの電車が止まり、通勤客は長時間待たされましたが、夕方には天気が回復し運転が再開されました。"
+                ],
+                "score": 1
+              },
+              {
+                "category": "japanese",
+                "check": "matches /1,\\s?2,\\s?3,\\s?4,\\s?5/",
+                "errors": [],
+                "id": "ja-digits",
+                "latency_s_mean": 3.840737583,
+                "outputs": [
+                  "1, 2, 3, 4, 5"
+                ],
+                "score": 1
+              },
+              {
+                "category": "summarization",
+                "check": "contains any of [\"plant\", \"photosynthesis\"] AND contains any of [\"sunlight\", \"light\"] AND ≤ 32 words",
+                "errors": [],
+                "id": "summ-photo",
+                "latency_s_mean": 3.701890167,
+                "outputs": [
+                  "Photosynthesis, using chlorophyll, converts sunlight into nutrients and oxygen, essential for life."
+                ],
+                "score": 1
+              },
+              {
+                "category": "code",
+                "check": "contains all of [\"def add\", \"return\"]",
+                "errors": [],
+                "id": "code-write",
+                "latency_s_mean": 6.746297291,
+                "outputs": [
+                  "```python\ndef add(a, b):\n    return a + b\n```"
+                ],
+                "score": 1
+              },
+              {
+                "category": "code",
+                "check": "last number = 5.0 ±0.0",
+                "errors": [],
+                "id": "code-eval",
+                "latency_s_mean": 0.304268667,
+                "outputs": [
+                  "5"
+                ],
+                "score": 1
+              },
+              {
+                "category": "code",
+                "check": "matches /range\\(10\\)\\s*:/",
+                "errors": [],
+                "id": "code-fix",
+                "latency_s_mean": 0.606863292,
+                "outputs": [
+                  "```python\nfor i in range(10):\n    print(i)\n```"
+                ],
+                "score": 1
+              }
+            ],
+            "wall_s": 227.474496875
+          }
+        },
+        "context": {
+          "options": {
+            "guardrails": "default",
+            "sampling": "default",
+            "useCase": "general"
+          },
+          "recordedAt": "2026-09-10T23:21:55Z",
+          "result": {
+            "attempts": [
+              {
+                "chars": 1150,
+                "ok": 1,
+                "seconds": 3.562236042,
+                "words": 200
+              },
+              {
+                "chars": 43690,
+                "errorKind": "exceededContextWindowSize",
+                "ok": 0,
+                "seconds": 9.47665675,
+                "words": 8000
+              },
+              {
+                "chars": 22417,
+                "errorKind": "exceededContextWindowSize",
+                "ok": 0,
+                "seconds": 1.628298083,
+                "words": 4100
+              },
+              {
+                "chars": 11785,
+                "ok": 1,
+                "seconds": 16.15896875,
+                "words": 2150
+              },
+              {
+                "chars": 17098,
+                "ok": 1,
+                "seconds": 16.150983416,
+                "words": 3125
+              },
+              {
+                "chars": 19769,
+                "ok": 1,
+                "seconds": 16.918172875,
+                "words": 3612
+              },
+              {
+                "chars": 21090,
+                "errorKind": "exceededContextWindowSize",
+                "ok": 0,
+                "seconds": 1.6268220420000001,
+                "words": 3856
+              },
+              {
+                "chars": 20430,
+                "errorKind": "exceededContextWindowSize",
+                "ok": 0,
+                "seconds": 1.56946775,
+                "words": 3734
+              },
+              {
+                "chars": 20079,
+                "errorKind": "exceededContextWindowSize",
+                "ok": 0,
+                "seconds": 1.425116333,
+                "words": 3673
+              },
+              {
+                "chars": 19921,
+                "errorKind": "exceededContextWindowSize",
+                "ok": 0,
+                "seconds": 1.369008,
+                "words": 3642
+              },
+              {
+                "chars": 19851,
+                "ok": 1,
+                "seconds": 16.986949583,
+                "words": 3627
+              }
+            ],
+            "charsPerToken": 4.739583333333333,
+            "estimatedContextTokens": 4188.342857142858,
+            "failureKind": "exceededContextWindowSize",
+            "maxOkChars": 19851,
+            "maxOkWords": 3627,
+            "minFailChars": 19921,
+            "minFailWords": 3642,
+            "options": {
+              "guardrails": "default",
+              "sampling": "default",
+              "useCase": "general"
+            }
+          }
+        },
+        "speed": {
+          "options": {
+            "guardrails": "default",
+            "sampling": "default",
+            "useCase": "general"
+          },
+          "recordedAt": "2026-09-10T23:35:48Z",
+          "result": {
+            "coldStart": {
+              "chars": 6,
+              "chars_per_s": 142.41196644080995,
+              "chunks": 1,
+              "decode_s": 0.042131291000000015,
+              "ok": true,
+              "total_s": 1.120872541,
+              "ttft_s": 1.07874125
+            },
+            "decode": {
+              "baseTokens": 32,
+              "chars_per_token_mean": 3.2890625,
+              "chunks_long_mean": 16,
+              "method": "differential: N / (T(base+N) - T(base))",
+              "naive_tokens_per_s_mean(total-ttft)": 58.89249690354257,
+              "runs": [
+                {
+                  "long": {
+                    "chars": 533,
+                    "chars_per_s": 194.22336410271853,
+                    "chunks": 16,
+                    "chunks_per_s": 5.465948333097145,
+                    "decode_s": 2.744263042,
+                    "ok": true,
+                    "total_s": 3.1602845,
+                    "ttft_s": 0.416021458
+                  },
+                  "short": {
+                    "chars": 112,
+                    "chars_per_s": 233.13278231442723,
+                    "chunks": 4,
+                    "chunks_per_s": 6.2446280977078725,
+                    "decode_s": 0.480412917,
+                    "ok": true,
+                    "total_s": 0.905407125,
+                    "ttft_s": 0.424994208
+                  }
+                },
+                {
+                  "long": {
+                    "chars": 533,
+                    "chars_per_s": 193.69509443174059,
+                    "chunks": 16,
+                    "chunks_per_s": 5.451081456803205,
+                    "decode_s": 2.751747542,
+                    "ok": true,
+                    "total_s": 3.164190875,
+                    "ttft_s": 0.412443333
+                  },
+                  "short": {
+                    "chars": 112,
+                    "chars_per_s": 227.47276991002386,
+                    "chunks": 4,
+                    "chunks_per_s": 6.093020622589925,
+                    "decode_s": 0.492366625,
+                    "ok": true,
+                    "total_s": 0.918474417,
+                    "ttft_s": 0.426107792
+                  }
+                },
+                {
+                  "long": {
+                    "chars": 533,
+                    "chars_per_s": 200.63843239531948,
+                    "chunks": 16,
+                    "chunks_per_s": 5.646484964220999,
+                    "decode_s": 2.656519958,
+                    "ok": true,
+                    "total_s": 3.075129625,
+                    "ttft_s": 0.418609667
+                  },
+                  "short": {
+                    "chars": 112,
+                    "chars_per_s": 232.9522176814011,
+                    "chunks": 4,
+                    "chunks_per_s": 6.239791545037529,
+                    "decode_s": 0.48078529200000003,
+                    "ok": true,
+                    "total_s": 0.910711,
+                    "ttft_s": 0.429925708
+                  }
+                }
+              ],
+              "tokens": 128,
+              "tokens_per_s_max": 59.138282456795984,
+              "tokens_per_s_mean": 57.633839705938435,
+              "tokens_per_s_min": 56.76583632402627,
+              "ttft_s_mean": 0.41569148600000005
+            },
+            "memory": [
+              {
+                "baseline_rss_mb": 18.71875,
+                "delta_mb": 0.140625,
+                "peak_rss_mb": 18.859375,
+                "process": "GenerativeExperiencesSafetyInferenceProvider[1988]"
+              },
+              {
+                "baseline_rss_mb": 16.46875,
+                "delta_mb": 0,
+                "peak_rss_mb": 16.46875,
+                "process": "ModelCatalogAgent[7749]"
+              },
+              {
+                "baseline_rss_mb": 17.609375,
+                "delta_mb": 0,
+                "peak_rss_mb": 17.609375,
+                "process": "PrivateMLClientInferenceProviderService[72446]"
+              },
+              {
+                "baseline_rss_mb": 245.328125,
+                "delta_mb": 163.71875,
+                "peak_rss_mb": 409.046875,
+                "process": "TGOnDeviceInferenceProviderService[1986]"
+              },
+              {
+                "baseline_rss_mb": 159.5,
+                "delta_mb": 135.40625,
+                "peak_rss_mb": 294.90625,
+                "process": "TGOnDeviceInferenceProviderService[1990]"
+              },
+              {
+                "baseline_rss_mb": 22.5,
+                "delta_mb": 0.28125,
+                "peak_rss_mb": 22.78125,
+                "process": "modelcatalogd[428]"
+              },
+              {
+                "baseline_rss_mb": 29.0625,
+                "delta_mb": 2.0625,
+                "peak_rss_mb": 31.125,
+                "process": "modelmanagerd[749]"
+              }
+            ],
+            "memoryPeakTotalMB": 810.796875,
+            "options": {
+              "guardrails": "default",
+              "sampling": "default",
+              "useCase": "general"
+            },
+            "prefill": [
+              {
+                "chars": 500,
+                "chars_per_s": 1436.2594050861874,
+                "errors": [],
+                "est_tokens_per_s(4 chars/token)": 359.06485127154684,
+                "total_s_mean": 0.39597495833333335,
+                "ttft_s_mean": 0.34812652800000005
+              },
+              {
+                "chars": 2000,
+                "chars_per_s": 350.0545443526724,
+                "errors": [],
+                "est_tokens_per_s(4 chars/token)": 87.5136360881681,
+                "total_s_mean": 5.762860652666667,
+                "ttft_s_mean": 5.713395333
+              },
+              {
+                "chars": 6000,
+                "chars_per_s": 552.413448338215,
+                "errors": [],
+                "est_tokens_per_s(4 chars/token)": 138.10336208455374,
+                "total_s_mean": 10.914818888666668,
+                "ttft_s_mean": 10.861429999666667
+              }
+            ],
+            "runs": 3,
+            "structured": {
+              "generable": [
+                {
+                  "chars": 250,
+                  "chunks": 1,
+                  "ok": true,
+                  "total_s": 5.1299385
+                },
+                {
+                  "chars": 177,
+                  "chunks": 1,
+                  "ok": true,
+                  "total_s": 10.747776042
+                },
+                {
+                  "chars": 189,
+                  "chunks": 1,
+                  "ok": true,
+                  "total_s": 7.587348167
+                }
+              ],
+              "generable_total_s_mean": 7.8216875696666675,
+              "plain": [
+                {
+                  "chars": 730,
+                  "chunks": 1,
+                  "ok": true,
+                  "total_s": 10.230910958
+                },
+                {
+                  "chars": 588,
+                  "chunks": 1,
+                  "ok": true,
+                  "total_s": 6.422447375
+                },
+                {
+                  "chars": 759,
+                  "chunks": 1,
+                  "ok": true,
+                  "total_s": 7.255391333
+                }
+              ],
+              "plainJSON_total_s_mean": 7.969583222
+            },
+            "warmStart": {
+              "runs": [
+                {
+                  "chars": 6,
+                  "chars_per_s": 115.83067485846945,
+                  "chunks": 1,
+                  "decode_s": 0.05179974999999998,
+                  "ok": true,
+                  "total_s": 0.337236959,
+                  "ttft_s": 0.285437209
+                },
+                {
+                  "chars": 12,
+                  "chars_per_s": 238.55139664387994,
+                  "chunks": 1,
+                  "decode_s": 0.05030362500000002,
+                  "ok": true,
+                  "total_s": 0.364609833,
+                  "ttft_s": 0.314306208
+                },
+                {
+                  "chars": 6,
+                  "chars_per_s": 124.08434029154192,
+                  "chunks": 1,
+                  "decode_s": 0.04835420800000001,
+                  "ok": true,
+                  "total_s": 0.326200208,
+                  "ttft_s": 0.277846
+                }
+              ],
+              "ttft_s_mean": 0.2925298056666667
+            }
+          }
+        },
+        "tokens": {
+          "options": {
+            "guardrails": "default",
+            "sampling": "default",
+            "useCase": "general"
+          },
+          "recordedAt": "2026-09-10T23:29:53Z",
+          "result": {
+            "options": {
+              "guardrails": "default",
+              "sampling": "default",
+              "useCase": "general"
+            },
+            "samples": [
+              {
+                "bytesPerToken": 4.71875,
+                "charsPerToken": 4.71875,
+                "chunks": 4,
+                "decode_s": 9.505419250000001,
+                "estPromptTokens": 550.3576158940398,
+                "ok": 1,
+                "outputBytes": 151,
+                "outputChars": 151,
+                "sample": "english",
+                "sourceChars": 2500,
+                "tokens": 32,
+                "tokensPerSecond": 3.3665006412000182,
+                "total_s": 22.629073334,
+                "truncated": 1,
+                "ttft_s": 13.123654084
+              },
+              {
+                "bytesPerToken": 4.96875,
+                "charsPerToken": 1.65625,
+                "chunks": 4,
+                "decode_s": 6.470493459,
+                "estPromptTokens": 536.7547169811321,
+                "ok": 1,
+                "outputBytes": 159,
+                "outputChars": 53,
+                "sample": "japanese",
+                "sourceChars": 792,
+                "tokens": 32,
+                "tokensPerSecond": 4.945526983802179,
+                "total_s": 22.601306375,
+                "truncated": 1,
+                "ttft_s": 16.130812916
+              },
+              {
+                "bytesPerToken": 2.3125,
+                "charsPerToken": 2.3125,
+                "chunks": 4,
+                "decode_s": 3.411306458000002,
+                "estPromptTokens": 830.7027027027027,
+                "ok": 1,
+                "outputBytes": 74,
+                "outputChars": 74,
+                "sample": "code",
+                "sourceChars": 1824,
+                "tokens": 32,
+                "tokensPerSecond": 9.380570287068586,
+                "total_s": 23.119162542,
+                "truncated": 1,
+                "ttft_s": 19.707856084
+              },
+              {
+                "bytesPerToken": 1,
+                "charsPerToken": 1,
+                "chunks": 4,
+                "decode_s": 3.519519290999998,
+                "estPromptTokens": 2461,
+                "ok": 1,
+                "outputBytes": 32,
+                "outputChars": 32,
+                "sample": "numbers",
+                "sourceChars": 2364,
+                "tokens": 32,
+                "tokensPerSecond": 9.09215076099437,
+                "total_s": 19.648338083,
+                "truncated": 1,
+                "ttft_s": 16.128818792
+              },
+              {
+                "bytesPerToken": 1.125,
+                "charsPerToken": 1.125,
+                "chunks": 4,
+                "decode_s": 6.599925124999999,
+                "estPromptTokens": 2058.6666666666665,
+                "ok": 1,
+                "outputBytes": 36,
+                "outputChars": 36,
+                "sample": "uuid-hex",
+                "sourceChars": 2219,
+                "tokens": 32,
+                "tokensPerSecond": 4.8485398537002355,
+                "total_s": 18.635700625,
+                "truncated": 1,
+                "ttft_s": 12.0357755
+              }
+            ],
+            "tokens": 32
+          }
+        }
+      },
+      "createdAt": "2026-09-10T23:18:23Z",
+      "environment": {
+        "chip": "Apple M1 Max",
+        "cpuCores": 10,
+        "fmbenchVersion": "0.2.0",
+        "frameworkBuild": "1.5.2",
+        "machine": "Mac13,1",
+        "memoryGB": 64,
+        "modelAssetsModified": "2026-09-06T17:36:38Z",
+        "osBuild": "25G83",
+        "osVersion": "26.6.2",
+        "supportedLanguageCount": 23
+      },
+      "key": "Mac13,1 | Apple M1 Max | 64 | 26.6.2 | 25G83 | 1.5.2 | 2026-09-06T17:36:38Z",
+      "updatedAt": "2026-09-10T23:35:48Z"
+    }
+  ],
+  "generatedBy": "FoundationModels.bench 0.2.0",
+  "version": 1
+}

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoundationModels.bench</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface: #fcfcfb; --surface-2: #f3f2ef; --border: #e2e1dc;
+    --text: #0b0b0b; --text-2: #52514e; --text-3: #8a8985;
+    --series: #2a78d6; --track: #eceae5; --good: #008300; --bad: #e34948;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface: #1a1a19; --surface-2: #232322; --border: #3a3936;
+      --text: #ffffff; --text-2: #c3c2b7; --text-3: #8a8985;
+      --series: #3987e5; --track: #2e2d2b; --good: #4fbf4f; --bad: #e66767;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface: #1a1a19; --surface-2: #232322; --border: #3a3936;
+    --text: #ffffff; --text-2: #c3c2b7; --text-3: #8a8985;
+    --series: #3987e5; --track: #2e2d2b; --good: #4fbf4f; --bad: #e66767;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding-block: 24px 48px; padding-inline: 16px; background: var(--surface); color: var(--text);
+         font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Hiragino Sans", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 32px 0 12px; }
+  h3 { font-size: 14px; margin: 20px 0 8px; color: var(--text-2); }
+  p.lead { color: var(--text-2); margin: 0 0 16px; }
+  .muted { color: var(--text-3); font-size: 12px; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; background: var(--surface-2); padding: 1px 4px; border-radius: 3px; }
+  pre { background: var(--surface-2); padding: 10px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+  .notice { border: 1px solid var(--border); background: var(--surface-2); padding: 12px 14px; border-radius: 8px; margin: 16px 0; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 16px 0; }
+  .tile { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; background: var(--surface); }
+  .tile .v { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .tile .k { color: var(--text-2); font-size: 12px; }
+  .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .chart { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .chart h3 { margin: 0 0 10px; }
+  .row { display: grid; grid-template-columns: minmax(90px, 32%) 1fr auto; align-items: center; gap: 8px; padding: 4px 0; cursor: default; }
+  .row:hover { background: var(--surface-2); border-radius: 4px; }
+  .row .lbl { font-size: 12px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .track { height: 12px; background: var(--track); border-radius: 0 4px 4px 0; position: relative; }
+  .row .bar { height: 100%; background: var(--series); border-radius: 0 4px 4px 0; min-width: 2px; }
+  .row .val { font-size: 12px; font-variant-numeric: tabular-nums; min-width: 60px; text-align: right; }
+  .row.active .lbl { color: var(--text); font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  .tablewrap { overflow-x: auto; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; white-space: nowrap; }
+  th { color: var(--text-2); font-weight: 600; font-size: 12px; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.wrap { white-space: normal; max-width: 420px; }
+  tr.sel td { background: var(--surface-2); }
+  tbody tr { cursor: pointer; }
+  .pass { color: var(--good); } .fail { color: var(--bad); }
+  .picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 16px; }
+  .picker button { border: 1px solid var(--border); background: var(--surface); color: var(--text); padding: 6px 10px; border-radius: 999px; cursor: pointer; font-size: 13px; }
+  .picker button.active { background: var(--series); border-color: var(--series); color: #fff; }
+  .tip { position: fixed; pointer-events: none; background: var(--text); color: var(--surface); padding: 6px 8px; border-radius: 6px; font-size: 12px; display: none; z-index: 10; white-space: pre; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  footer { margin-top: 40px; color: var(--text-3); font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>FoundationModels.bench</h1>
+  <p class="lead">Apple の on-device Foundation Model を <code>fmbench</code> で実測した結果(<code>benchmarks.json</code>)の一覧。マシン構成ごとに 1 エントリ。</p>
+
+  <div id="loadError" class="notice" hidden>
+    <strong>benchmarks.json を読み込めませんでした。</strong>
+    <div class="muted" style="margin-top:6px">
+      ブラウザは <code>file://</code> からの fetch を許可しません。リポジトリのルートで
+      <code>python3 -m http.server 8000</code> を実行して <code>http://localhost:8000/</code> を開くか、下からファイルを選択してください。
+    </div>
+    <p><input type="file" id="filePick" accept=".json,application/json"></p>
+  </div>
+
+  <div id="content" hidden>
+    <div class="tiles" id="tiles"></div>
+
+    <h2>マシン比較</h2>
+    <div class="charts" id="charts"></div>
+
+    <h2>マシン一覧</h2>
+    <div class="tablewrap"><table id="machines"></table></div>
+
+    <h2>詳細</h2>
+    <div class="picker" id="picker"></div>
+    <div id="detail"></div>
+  </div>
+
+  <footer id="footer"></footer>
+</main>
+<div class="tip" id="tip"></div>
+
+<script>
+(function () {
+  const $ = (s, r) => (r || document).querySelector(s);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const ms = s => (s == null || !isFinite(s)) ? '-' : Math.round(s * 1000).toLocaleString() + ' ms';
+  const num = (x, d = 1) => (x == null || !isFinite(x)) ? '-' : Number(x).toFixed(d);
+  const pct = x => (x == null || !isFinite(x)) ? '-' : (x * 100).toFixed(1) + '%';
+  const get = (o, path) => path.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o);
+  const tip = $('#tip');
+  let data = null, entries = [], selected = 0;
+
+  const labelOf = e => `${get(e, 'environment.chip') || '?'} · ${get(e, 'environment.memoryGB') || '?'} GB`;
+  const shortMachine = e => `${get(e, 'environment.machine')} · ${get(e, 'environment.chip')} · ${get(e, 'environment.memoryGB')} GB · macOS ${get(e, 'environment.osVersion')} (${get(e, 'environment.osBuild')})`;
+
+  // ---------- metrics used for cross-machine comparison (single series, one hue) ----------
+  const METRICS = [
+    { title: 'デコード速度 (tok/s, 差分法)', unit: 'tok/s', d: 1, higherBetter: true,
+      value: e => get(e, 'benchmarks.speed.result.decode.tokens_per_s_mean') },
+    { title: 'ウォーム TTFT (ms)', unit: 'ms', d: 0, higherBetter: false,
+      value: e => { const v = get(e, 'benchmarks.speed.result.warmStart.ttft_s_mean'); return v == null ? null : v * 1000; } },
+    { title: 'コールド起動 合計 (ms)', unit: 'ms', d: 0, higherBetter: false,
+      value: e => { const v = get(e, 'benchmarks.speed.result.coldStart.total_s'); return v == null ? null : v * 1000; } },
+    { title: '内蔵精度スイート 正答率 (%)', unit: '%', d: 1, higherBetter: true,
+      value: e => { const v = get(e, 'benchmarks.accuracy.result.overallAccuracy'); return v == null ? null : v * 100; } },
+    { title: 'コンテキスト長 推定 (tokens)', unit: 'tok', d: 0, higherBetter: true,
+      value: e => get(e, 'benchmarks.context.result.estimatedContextTokens') },
+    { title: '推論プロセス ピーク RSS 合計 (MB)', unit: 'MB', d: 0, higherBetter: false,
+      value: e => get(e, 'benchmarks.speed.result.memoryPeakTotalMB') },
+  ];
+
+  function barChart(metric) {
+    const rows = entries.map((e, i) => ({ i, label: labelOf(e), v: metric.value(e) })).filter(r => r.v != null && isFinite(r.v));
+    if (!rows.length) return '';
+    const max = Math.max(...rows.map(r => r.v));
+    const html = rows.map(r => `
+      <div class="row ${r.i === selected ? 'active' : ''}" data-i="${r.i}" data-tip="${esc(r.label)}\n${esc(shortMachine(entries[r.i]))}\n${num(r.v, metric.d)} ${metric.unit}">
+        <div class="lbl">${esc(r.label)}</div>
+        <div class="track"><div class="bar" style="width:${max > 0 ? (r.v / max * 100) : 0}%"></div></div>
+        <div class="val">${num(r.v, metric.d)}</div>
+      </div>`).join('');
+    return `<div class="chart"><h3>${esc(metric.title)}</h3>${html}</div>`;
+  }
+
+  function renderTiles() {
+    const speeds = entries.map(e => get(e, 'benchmarks.speed.result.decode.tokens_per_s_mean')).filter(v => v != null);
+    const accs = entries.map(e => get(e, 'benchmarks.accuracy.result.overallAccuracy')).filter(v => v != null);
+    const tiles = [
+      ['マシン数', entries.length],
+      ['最速デコード', speeds.length ? num(Math.max(...speeds)) + ' tok/s' : '-'],
+      ['最高正答率', accs.length ? pct(Math.max(...accs)) : '-'],
+      ['最終更新', entries.map(e => e.updatedAt).filter(Boolean).sort().pop()?.slice(0, 10) || '-'],
+    ];
+    $('#tiles').innerHTML = tiles.map(([k, v]) => `<div class="tile"><div class="v">${esc(v)}</div><div class="k">${esc(k)}</div></div>`).join('');
+  }
+
+  function renderCharts() {
+    $('#charts').innerHTML = METRICS.map(barChart).join('') || '<p class="muted">比較できる結果がありません。</p>';
+  }
+
+  function renderMachines() {
+    const head = ['マシン', 'チップ', 'メモリ', 'macOS', 'FM build', 'モデル資産更新', '記録済み', '更新日'];
+    const rows = entries.map((e, i) => {
+      const env = e.environment || {};
+      const kinds = Object.keys(e.benchmarks || {}).sort().join(', ');
+      return `<tr class="${i === selected ? 'sel' : ''}" data-i="${i}">
+        <td>${esc(env.machine)}</td><td>${esc(env.chip)}</td>
+        <td class="num">${esc(env.memoryGB)} GB</td><td>${esc(env.osVersion)} (${esc(env.osBuild)})</td>
+        <td>${esc(env.frameworkBuild)}</td><td>${esc((env.modelAssetsModified || '').slice(0, 10))}</td>
+        <td>${esc(kinds)}</td><td>${esc((e.updatedAt || '').slice(0, 10))}</td></tr>`;
+    }).join('');
+    $('#machines').innerHTML = `<thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody>`;
+  }
+
+  function table(head, rows, opts = {}) {
+    const numCols = new Set(opts.num || []);
+    return `<div class="tablewrap"><table><thead><tr>${head.map((h, i) => `<th class="${numCols.has(i) ? 'num' : ''}">${esc(h)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r => `<tr>${r.map((c, i) => `<td class="${numCols.has(i) ? 'num' : ''} ${opts.wrap && opts.wrap.includes(i) ? 'wrap' : ''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+
+  function renderDetail() {
+    const e = entries[selected];
+    if (!e) { $('#detail').innerHTML = ''; return; }
+    const b = e.benchmarks || {};
+    let html = `<p class="muted">${esc(shortMachine(e))} · FoundationModels build ${esc(get(e, 'environment.frameworkBuild'))} · fmbench ${esc(get(e, 'environment.fmbenchVersion'))}</p>`;
+
+    if (b.speed) {
+      const r = b.speed.result, d = r.decode || {};
+      html += `<h3>速度 <span class="muted">(${esc(b.speed.recordedAt)}, runs=${esc(r.runs)})</span></h3><div class="grid2">`;
+      html += table(['項目', '値'], [
+        ['コールド起動 TTFT / 合計', `${ms(get(r, 'coldStart.ttft_s'))} / ${ms(get(r, 'coldStart.total_s'))}`],
+        ['ウォーム TTFT (平均)', ms(get(r, 'warmStart.ttft_s_mean'))],
+        [`デコード tok/s (差分法, ${esc(d.tokens)} tok)`, `${num(d.tokens_per_s_mean)} (min ${num(d.tokens_per_s_min)}, max ${num(d.tokens_per_s_max)})`],
+        ['デコード tok/s (naive: tokens ÷ (total−TTFT))', num(d['naive_tokens_per_s_mean(total-ttft)'])],
+        ['chars/token (英語カウント文)', num(d.chars_per_token_mean, 2)],
+        ['ストリーミング chunks (long run 平均)', num(d.chunks_long_mean, 0)],
+        ['構造化: プレーン JSON 依頼', ms(get(r, 'structured.plainJSON_total_s_mean'))],
+        ['構造化: @Generable', ms(get(r, 'structured.generable_total_s_mean'))],
+        ['推論プロセス ピーク RSS 合計', num(r.memoryPeakTotalMB, 0) + ' MB'],
+      ]);
+      html += table(['プレフィル chars', 'TTFT', 'chars/s', 'errors'],
+        (r.prefill || []).map(p => [esc(p.chars), ms(p.ttft_s_mean), num(p.chars_per_s, 0), esc((p.errors || []).join(', '))]), { num: [0, 1, 2] });
+      html += `</div>`;
+      html += table(['プロセス', 'baseline MB', 'peak MB', 'Δ MB'],
+        (r.memory || []).map(m => [esc(m.process), num(m.baseline_rss_mb), num(m.peak_rss_mb), num(m.delta_mb)]), { num: [1, 2, 3] });
+    }
+
+    if (b.accuracy) {
+      const r = b.accuracy.result;
+      html += `<h3>精度 <span class="muted">(${esc(b.accuracy.recordedAt)}, ${esc(r.taskCount)} tasks × ${esc(r.runs)} run, overall ${pct(r.overallAccuracy)})</span></h3><div class="grid2">`;
+      html += table(['カテゴリ', '正答率', 'タスク数', '平均レイテンシ'],
+        (r.categories || []).map(c => [esc(c.category), pct(c.accuracy), esc(c.tasks), ms(c.latency_s_mean)]), { num: [1, 2, 3] });
+      const failed = (r.tasks || []).filter(t => t.score < 1);
+      html += table(['失敗タスク', 'カテゴリ', '出力 / エラー', '判定条件'],
+        failed.map(t => [esc(t.id), esc(t.category), esc((t.errors && t.errors[0]) || (t.outputs && t.outputs[0]) || ''), esc(t.check)]), { wrap: [2, 3] });
+      html += `</div>`;
+    }
+
+    if (b.tokens) {
+      const r = b.tokens.result;
+      html += `<h3>トークナイザ <span class="muted">(${esc(b.tokens.recordedAt)}, ${esc(r.tokens)} tokens 強制)</span></h3>`;
+      html += table(['サンプル', 'chars/tok', 'bytes/tok', '≈prompt tok', 'TTFT', '合計', 'chunks', 'truncated'],
+        (r.samples || []).map(s => [esc(s.sample), num(s.charsPerToken, 2), num(s.bytesPerToken, 2), num(s.estPromptTokens, 0), ms(s.ttft_s), ms(s.total_s), esc(s.chunks), esc(s.truncated)]),
+        { num: [1, 2, 3, 4, 5, 6] });
+    }
+
+    if (b.context) {
+      const r = b.context.result;
+      html += `<h3>コンテキスト長 <span class="muted">(${esc(b.context.recordedAt)})</span></h3>`;
+      html += table(['項目', '値'], [
+        ['成功した最大プロンプト', `${esc(r.maxOkWords)} words / ${esc(r.maxOkChars)} chars`],
+        ['失敗した最小プロンプト', `${esc(r.minFailWords)} words / ${esc(r.minFailChars)} chars (${esc(r.failureKind)})`],
+        ['filler chars/token', num(r.charsPerToken, 2)],
+        ['≈ 上限トークン数', num(r.estimatedContextTokens, 0)],
+        ['試行回数', esc((r.attempts || []).length)],
+      ]);
+    }
+    $('#detail').innerHTML = html;
+  }
+
+  function renderPicker() {
+    $('#picker').innerHTML = entries.map((e, i) => `<button class="${i === selected ? 'active' : ''}" data-i="${i}">${esc(labelOf(e))}</button>`).join('');
+  }
+
+  function renderAll() {
+    entries = (data.entries || []).slice().sort((a, b) => (get(b, 'benchmarks.speed.result.decode.tokens_per_s_mean') || 0) - (get(a, 'benchmarks.speed.result.decode.tokens_per_s_mean') || 0));
+    if (selected >= entries.length) selected = 0;
+    $('#content').hidden = false;
+    $('#loadError').hidden = true;
+    renderTiles(); renderCharts(); renderMachines(); renderPicker(); renderDetail();
+    $('#footer').textContent = `${data.generatedBy || 'FoundationModels.bench'} · ${entries.length} entries · benchmarks.json`;
+  }
+
+  function select(i) { selected = i; renderCharts(); renderMachines(); renderPicker(); renderDetail(); }
+
+  document.addEventListener('click', ev => {
+    const t = ev.target.closest('[data-i]');
+    if (t && $('#content').contains(t)) select(Number(t.dataset.i));
+  });
+  document.addEventListener('mousemove', ev => {
+    const r = ev.target.closest('.row[data-tip]');
+    if (!r) { tip.style.display = 'none'; return; }
+    tip.textContent = r.dataset.tip;
+    tip.style.display = 'block';
+    tip.style.left = Math.min(ev.clientX + 12, window.innerWidth - tip.offsetWidth - 8) + 'px';
+    tip.style.top = (ev.clientY + 12) + 'px';
+  });
+
+  $('#filePick').addEventListener('change', ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    f.text().then(t => { data = JSON.parse(t); renderAll(); }).catch(err => alert('JSON parse error: ' + err));
+  });
+
+  fetch('benchmarks.json', { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(j => { data = j; renderAll(); })
+    .catch(() => { $('#loadError').hidden = false; });
+})();
+</script>
+</body>
+</html>
