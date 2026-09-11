@@ -46,14 +46,30 @@ install -m 755 "$tmp/fmbench" "$dir/fmbench"
 xattr -d com.apple.quarantine "$dir/fmbench" 2>/dev/null || true
 
 printf 'Installed %s (%s)\n' "$dir/fmbench" "$("$dir/fmbench" --version 2>/dev/null || echo 'version unknown')"
-case ":$PATH:" in
-  *":$dir:"*) ;;
-  *) printf '\nnote: %s is not on your PATH. Add this to your shell profile (~/.zshrc):\n  export PATH="%s:$PATH"\n' "$dir" "$dir" ;;
-esac
+
+# Make sure `fmbench` resolves: add the install dir to the shell profile if it is not on PATH yet.
+on_path=false
+case ":$PATH:" in *":$dir:"*) on_path=true;; esac
+if [ "$on_path" = false ]; then
+  case "${SHELL:-/bin/zsh}" in
+    */zsh)  rc="$HOME/.zshrc" ;;
+    */bash) rc="$HOME/.bash_profile" ;;
+    *)      rc="$HOME/.profile" ;;
+  esac
+  line="export PATH=\"$dir:\$PATH\""
+  if ! grep -qsF "$line" "$rc" 2>/dev/null; then
+    printf '\n# fmbench (added by install.sh)\n%s\n' "$line" >> "$rc"
+    printf 'Added %s to PATH in %s (takes effect in new terminals).\n' "$dir" "$rc"
+  fi
+fi
+
 cat <<MSG
 
-Next steps (5–15 min, Apple Intelligence must be enabled):
-  cd ~ && mkdir -p fmbench && cd fmbench
+Next steps (5-15 min, Apple Intelligence must be enabled). Copy-paste the whole block:
+MSG
+[ "$on_path" = true ] || printf '  export PATH="%s:$PATH"\n' "$dir"
+cat <<'MSG'
+  mkdir -p ~/fmbench && cd ~/fmbench
   fmbench bench speed
   fmbench bench accuracy
   fmbench probe tokens

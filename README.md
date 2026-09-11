@@ -12,6 +12,7 @@ Apple の `FoundationModels.framework`(Apple Intelligence のオンデバイス 
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/TetsuakiBaba/FoundationModels.bench/main/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"   # 同じターミナルで続ける場合(新しいターミナルでは不要)
 mkdir -p ~/fmbench && cd ~/fmbench
 for c in "bench speed" "bench accuracy" "probe tokens" "probe context"; do fmbench $c; done
 fmbench submit
