@@ -204,6 +204,10 @@ struct Info: AsyncParsableCommand {
             ("permissive guardrails", describeAvailability(permissive.availability)),
             ("Languages (\(langs.count))", langNames.joined(separator: "\n")),
         ])
+        if let hint = availabilityHint(general.availability) {
+            print("")
+            print(hint.split(separator: "\n").map { "  ! " + $0 }.joined(separator: "\n"))
+        }
         printSection("Model assets (MobileAsset)")
         printKV(assets.map { a in
             let present = a["present"] as? Bool ?? false

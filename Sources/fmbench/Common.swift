@@ -188,9 +188,35 @@ func describeAvailability(_ a: SystemLanguageModel.Availability) -> String {
     }
 }
 
+/// Actionable hint for each unavailability reason (shown to first-time users).
+func availabilityHint(_ a: SystemLanguageModel.Availability) -> String? {
+    guard case .unavailable(let reason) = a else { return nil }
+    switch reason {
+    case .appleIntelligenceNotEnabled:
+        return """
+        Apple Intelligence is turned off on this Mac. Turn it on:
+          System Settings > Apple Intelligence & Siri > Apple Intelligence: On
+        The first time, macOS downloads the model (a few GB); wait until the download finishes,
+        then run `fmbench info` — it should say "available".
+        """
+    case .modelNotReady:
+        return """
+        Apple Intelligence is on but the on-device model is still downloading or being prepared.
+        Keep the Mac awake and connected, wait a few minutes, then run `fmbench info` again.
+        """
+    case .deviceNotEligible:
+        return "This Mac cannot run Apple Intelligence (Apple Silicon and macOS 26 or later are required)."
+    @unknown default:
+        return nil
+    }
+}
+
 func requireAvailable(_ model: SystemLanguageModel) throws {
     guard model.isAvailable else {
-        throw ValidationError("Model is \(describeAvailability(model.availability)). Run `fmbench info` for details.")
+        var msg = "Model is \(describeAvailability(model.availability))."
+        if let hint = availabilityHint(model.availability) { msg += "\n" + hint } else { msg += " Run `fmbench info` for details." }
+        FileHandle.standardError.write(Data(("error: " + msg + "\n").utf8))
+        throw ExitCode(1)
     }
 }
 

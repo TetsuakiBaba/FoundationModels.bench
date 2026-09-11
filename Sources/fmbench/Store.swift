@@ -2,7 +2,7 @@ import ArgumentParser
 import Foundation
 import FoundationModels
 
-let fmbenchVersion = "0.3.0"
+let fmbenchVersion = "0.3.1"
 
 // MARK: - Environment fingerprint
 
