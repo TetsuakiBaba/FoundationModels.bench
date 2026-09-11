@@ -1,0 +1,26 @@
+name: Benchmark result
+description: Share a benchmarks.json entry produced by `fmbench` (normally opened by `fmbench submit`)
+title: "bench: "
+labels: ["benchmark-result"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing your measurement! `fmbench submit` fills this form for you.
+        If you got here by hand: run `fmbench submit` on the machine you benchmarked, or paste the
+        `entries[...]` object for your machine from `benchmarks.json` below. A bot will turn this
+        issue into a pull request against `benchmarks.json`.
+  - type: textarea
+    id: entry
+    attributes:
+      label: Result JSON
+      description: One entry object (or an array of entries) from benchmarks.json. `fmbench submit` copies it to your clipboard — just paste (Cmd+V).
+      render: json
+      placeholder: '{"key": "...", "environment": {...}, "benchmarks": {...}}'
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Optional — anything unusual (thermal state, other load, external display, etc.)

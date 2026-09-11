@@ -6,9 +6,28 @@ Apple の `FoundationModels.framework`(Apple Intelligence のオンデバイス 
 
 ## 最速手順(コピペ用)
 
-### clone → ベンチ → PR で結果を共有する
+### A. ビルド不要: インストーラ → ベンチ → `fmbench submit`(推奨)
 
-前提: Apple Silicon Mac / macOS 26 以降 / Apple Intelligence オン / Xcode 26 以降 / [GitHub CLI](https://cli.github.com)(`brew install gh && gh auth login`)
+前提: Apple Silicon Mac / macOS 26 以降 / Apple Intelligence オン。**Xcode は不要**です。
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/TetsuakiBaba/FoundationModels.bench/main/install.sh | sh
+mkdir -p ~/fmbench && cd ~/fmbench
+for c in "bench speed" "bench accuracy" "probe tokens" "probe context"; do fmbench $c; done
+fmbench submit
+```
+
+`install.sh` は [Releases](https://github.com/TetsuakiBaba/FoundationModels.bench/releases) のビルド済みバイナリを
+`~/.local/bin`(書き込めれば `/usr/local/bin`)に置きます。結果はカレントディレクトリの `benchmarks.json` に保存されます。
+
+`fmbench submit` は自分のマシンの結果を GitHub Issue として送ります。
+[GitHub CLI](https://cli.github.com)(`gh`)でログイン済みならその場で Issue が作られ、そうでなければ JSON をクリップボードにコピーして
+ブラウザで Issue フォームを開くので、貼り付けて「Submit new issue」を押すだけです。
+Issue は bot が `benchmarks.json` への Pull Request に変換し、マージされると比較表に載ります。
+
+### B. ソースからビルドして PR で結果を共有する
+
+前提: A に加えて **Xcode 26 以降**(Command Line Tools だけでは不可)/ `gh`
 
 ```sh
 gh repo fork TetsuakiBaba/FoundationModels.bench --clone && cd FoundationModels.bench
@@ -23,11 +42,11 @@ git push -u origin HEAD
 gh pr create --fill
 ```
 
-### ベンチマークだけ取る(PR しない)
+### ベンチマークだけ取る(共有しない)
 
 ```sh
 git clone https://github.com/TetsuakiBaba/FoundationModels.bench.git && cd FoundationModels.bench
-swift build -c release
+swift build -c release   # または上の install.sh で fmbench を入れて ./.build/release/fmbench → fmbench に読み替え
 for c in "bench speed" "bench accuracy" "probe tokens" "probe context"; do
   ./.build/release/fmbench $c
 done
@@ -36,14 +55,26 @@ open http://localhost:8000/
 ```
 
 結果は `benchmarks.json` に保存され、ブラウザで自分のマシンの結果を確認できます。
-モデル情報だけ見たい場合は `./.build/release/fmbench info --deep`、単発の計測は `./.build/release/fmbench run "プロンプト"` です。
+モデル情報だけ見たい場合は `fmbench info --deep`、単発の計測は `fmbench run "プロンプト"` です。
 
 所要時間は 5〜15 分(モデルの状態で変動)。速度がおかしいと感じたら `bench speed --force` で取り直せます。
-`gh` を使わない場合は GitHub 上で Fork → `git clone <自分のfork>` → 上記 2 行目以降 → Web で Pull Request を作成してください。
 同じマシン構成の結果が既にあると実行前に上書き確認が出ます(`--force` / `--no-save` で制御)。
 
+### ビルドでつまずいたら
+
+`swift build` で `plugin for module 'FoundationModelsMacros' not found` と出る場合は、
+選択中のツールチェーンが Xcode 26 ではありません(Command Line Tools 単体や古い Xcode)。
+
+```sh
+xcode-select -p        # /Applications/Xcode.app/Contents/Developer になっていること
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+rm -rf .build && swift build -c release
+```
+
+Xcode を入れたくない場合は A のビルド済みバイナリを使ってください。
+
 ## これは何か
-- 対応環境: macOS 26 以降 / Apple Silicon / Apple Intelligence 有効 / Xcode 26 以降
+- 対応環境: macOS 26 以降 / Apple Silicon / Apple Intelligence 有効(ソースからビルドする場合のみ Xcode 26 以降)
 - 依存: [swift-argument-parser](https://github.com/apple/swift-argument-parser)
 
 ```sh
@@ -61,6 +92,7 @@ swift build -c release
 | `fmbench probe context` | コンテキスト長の実測(`exceededContextWindowSize` を二分探索) |
 | `fmbench probe tokens` | トークナイザ挙動: 英語/日本語/コード/数字/16進の chars/token を実測 |
 | `fmbench run "<prompt>"` | 1 プロンプトをストリーミング実行して計測値を表示 |
+| `fmbench submit` | `benchmarks.json` の自分のマシンの結果を GitHub Issue として送信(`--all` で全エントリ、`--dry-run` で確認のみ) |
 
 すべてのサブコマンドが `--json` で機械可読な出力を返します。ベンチ/プローブの結果は `benchmarks.json` に自動記録され、
 `index.html` で閲覧できます(後述)。
@@ -110,8 +142,19 @@ python3 -m http.server 8000   # リポジトリのルートで
 open http://localhost:8000/
 ```
 
-他の人にベンチを取ってもらう流れ: リポジトリを clone → `swift build -c release` →
-`./.build/release/fmbench bench speed`(必要なら accuracy / probe も)→ `benchmarks.json` を PR で送る。
+他の人にベンチを取ってもらう流れ: `install.sh` で `fmbench` を入れる → `fmbench bench speed`(必要なら accuracy / probe も)→
+`fmbench submit`。送られた Issue は [ingest-results](.github/workflows/ingest-results.yml) ワークフローが
+`scripts/ingest.py` で `benchmarks.json` にマージし、Pull Request を開きます(メンテナがマージ)。
+
+## リリース(メンテナ向け)
+
+`Sources/fmbench/Store.swift` の `fmbenchVersion` を上げてタグを push すると、
+[release](.github/workflows/release.yml) ワークフローが macOS 26 ランナーでビルドし、
+`fmbench-macos-arm64.tar.gz` を GitHub Release に添付します(`install.sh` はこれを取得します)。
+
+```sh
+git tag v0.3.0 && git push origin v0.3.0
+```
 
 ## 独自タスク(JSONL)
 

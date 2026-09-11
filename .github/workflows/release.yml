@@ -1,0 +1,63 @@
+# Builds the fmbench binary on a macOS 26 runner and attaches it to the GitHub Release for the tag.
+# Usage: bump fmbenchVersion in Sources/fmbench/Store.swift, then
+#   git tag v0.3.0 && git push origin v0.3.0
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        run: |
+          xc=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          [ -n "$xc" ] || xc=/Applications/Xcode.app
+          sudo xcode-select -s "$xc/Contents/Developer"
+          xcodebuild -version
+          swift --version
+
+      - name: Check version matches tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          src=$(sed -n 's/^let fmbenchVersion = "\(.*\)"$/\1/p' Sources/fmbench/Store.swift)
+          echo "tag=$tag source=$src"
+          [ "$tag" = "$src" ] || { echo "::error::fmbenchVersion ($src) does not match tag ($tag)"; exit 1; }
+
+      - name: Build
+        run: |
+          swift build -c release --arch arm64
+          bin=.build/release/fmbench
+          codesign --force --sign - --identifier jp.ac.tmu.fmbench "$bin"
+          "$bin" --version
+          mkdir -p dist
+          cp "$bin" dist/
+          cp README.md LICENSE* dist/ 2>/dev/null || true
+          tar -C dist -czf fmbench-macos-arm64.tar.gz .
+          shasum -a 256 fmbench-macos-arm64.tar.gz | tee fmbench-macos-arm64.tar.gz.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fmbench-macos-arm64
+          path: |
+            fmbench-macos-arm64.tar.gz
+            fmbench-macos-arm64.tar.gz.sha256
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            fmbench-macos-arm64.tar.gz fmbench-macos-arm64.tar.gz.sha256 \
+            --title "fmbench $GITHUB_REF_NAME" --generate-notes \
+            --notes "Prebuilt \`fmbench\` for Apple Silicon / macOS 26 (no Xcode needed). Install: \`curl -fsSL https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/install.sh | sh\`"

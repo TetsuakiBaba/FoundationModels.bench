@@ -1,0 +1,72 @@
+# Turns a "bench: ..." issue (opened by `fmbench submit` or the issue form) into a pull request
+# that merges the posted entry into benchmarks.json.
+name: Ingest benchmark result
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  ingest:
+    if: startsWith(github.event.issue.title, 'bench:')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Merge entry into benchmarks.json
+        id: merge
+        env:
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          printf '%s' "$BODY" > /tmp/issue-body.md
+          set +e
+          python3 scripts/ingest.py /tmp/issue-body.md benchmarks.json > /tmp/summary.md 2> /tmp/error.txt
+          code=$?
+          set -e
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          cat /tmp/summary.md /tmp/error.txt
+
+      - name: Report a problem on the issue
+        if: steps.merge.outputs.code != '0' && steps.merge.outputs.code != '3'
+        run: |
+          if [ "${{ steps.merge.outputs.code }}" = "2" ]; then
+            msg="I could not find a \`\`\`json block in this issue, so nothing was ingested. Run \`fmbench submit\` on the benchmarked machine, or edit this issue and paste the entry from \`benchmarks.json\` into the **Result JSON** box."
+          else
+            msg="The posted JSON could not be ingested: \`$(head -c 400 /tmp/error.txt)\`. Edit the issue to fix it and I will retry."
+          fi
+          gh issue comment "$ISSUE" --body "$msg"
+
+      - name: Nothing new
+        if: steps.merge.outputs.code == '3'
+        run: gh issue comment "$ISSUE" --body "benchmarks.json already contains exactly this result — nothing to do. Thanks!"
+
+      - name: Open / update pull request
+        if: steps.merge.outputs.code == '0'
+        run: |
+          branch="bench/issue-$ISSUE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add benchmarks.json
+          git commit -m "bench: ingest result from #$ISSUE" \
+            -m "$(cat /tmp/summary.md)" \
+            -m "Submitted by @${{ github.event.issue.user.login }}"
+          git push --force -u origin "$branch"
+          existing=$(gh pr list --head "$branch" --state open --json url --jq '.[0].url')
+          if [ -n "$existing" ]; then
+            gh issue comment "$ISSUE" --body "Updated $existing with the edited result."
+          else
+            body=$(printf 'Adds the result posted in #%s by @%s.\n\n%s\n\nCloses #%s' \
+              "$ISSUE" "${{ github.event.issue.user.login }}" "$(cat /tmp/summary.md)" "$ISSUE")
+            url=$(gh pr create --base main --head "$branch" \
+              --title "${{ github.event.issue.title }}" --body "$body")
+            gh issue comment "$ISSUE" --body "Thanks! Your result is queued for review in $url and will appear in the comparison table once merged."
+          fi

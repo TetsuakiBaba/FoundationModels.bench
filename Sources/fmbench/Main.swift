@@ -14,8 +14,10 @@ struct FMBench: AsyncParsableCommand {
           probe context   Empirically find the context-window limit
           probe tokens    Estimate chars-per-token for several text types (tokenizer behaviour)
           run             Run one prompt and print timing stats
+          submit          Share your benchmarks.json results as a GitHub Issue (no clone / PR needed)
         """,
-        subcommands: [Info.self, Bench.self, Probe.self, Run.self]
+        version: fmbenchVersion,
+        subcommands: [Info.self, Bench.self, Probe.self, Run.self, Submit.self]
     )
 }
 
