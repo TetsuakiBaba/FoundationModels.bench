@@ -6,25 +6,31 @@ Apple の `FoundationModels.framework`(Apple Intelligence のオンデバイス 
 
 ## 最速手順(コピペ用)
 
-### A. ビルド不要: インストーラ → ベンチ → `fmbench submit`(推奨)
+### A. ビルド不要: 1 行でインストール → 全ベンチ → 結果送信(推奨)
 
 前提: Apple Silicon Mac / macOS 26 以降 / Apple Intelligence オン。**Xcode は不要**です。
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/TetsuakiBaba/FoundationModels.bench/main/install.sh | sh
-export PATH="$HOME/.local/bin:$PATH"   # 同じターミナルで続ける場合(新しいターミナルでは不要)
-mkdir -p ~/fmbench && cd ~/fmbench
-for c in "bench speed" "bench accuracy" "probe tokens" "probe context"; do fmbench $c; done
-fmbench submit
 ```
 
-`install.sh` は [Releases](https://github.com/TetsuakiBaba/FoundationModels.bench/releases) のビルド済みバイナリを
-`~/.local/bin`(書き込めれば `/usr/local/bin`)に置きます。結果はカレントディレクトリの `benchmarks.json` に保存されます。
+これだけで、[Releases](https://github.com/TetsuakiBaba/FoundationModels.bench/releases) のビルド済み `fmbench` を
+`~/.local/bin` に入れ、`~/fmbench/benchmarks.json` に向けて `fmbench bench all --submit`
+(speed → accuracy → probe tokens → probe context → submit)を実行します。所要 5〜15 分。
 
-`fmbench submit` は自分のマシンの結果を GitHub Issue として送ります。
+最後の `submit` は自分のマシンの結果を GitHub Issue として送ります。
 [GitHub CLI](https://cli.github.com)(`gh`)でログイン済みならその場で Issue が作られ、そうでなければ JSON をクリップボードにコピーして
 ブラウザで Issue フォームを開くので、貼り付けて「Submit new issue」を押すだけです。
 Issue は bot が `benchmarks.json` への Pull Request に変換し、マージされると比較表に載ります。
+
+環境変数で挙動を変えられます(`FMBENCH_INSTALL_ONLY=1 sh` のように前置)。
+
+| 変数 | 効果 |
+| --- | --- |
+| `FMBENCH_INSTALL_ONLY=1` | インストールのみ。あとで `fmbench bench all --submit` を手動実行 |
+| `FMBENCH_NO_SUBMIT=1` | ベンチは走らせるが Issue は開かない |
+| `FMBENCH_WORKDIR=/path` | `benchmarks.json` の置き場所(既定 `~/fmbench`) |
+| `FMBENCH_VERSION=0.3.2` | 特定の Release を入れる |
 
 ### B. ソースからビルドして PR で結果を共有する
 
@@ -47,7 +53,7 @@ gh pr create --fill
 
 ```sh
 git clone https://github.com/TetsuakiBaba/FoundationModels.bench.git && cd FoundationModels.bench
-swift build -c release   # または上の install.sh で fmbench を入れて ./.build/release/fmbench → fmbench に読み替え
+swift build -c release
 for c in "bench speed" "bench accuracy" "probe tokens" "probe context"; do
   ./.build/release/fmbench $c
 done
@@ -90,6 +96,7 @@ swift build -c release
 | `fmbench info [--deep]` | モデル属性: 可用性、対応言語、フレームワーク/推論プロセスのバージョン、モデル資産、推論プロセスのメモリ。`--deep` でモデルをロードしてメモリ増分・トランスクリプト・自己申告も取得 |
 | `fmbench bench speed` | 速度: コールド/ウォーム起動、TTFT、デコード tok/s(差分法)、プレフィルのスケーリング、`@Generable` 構造化出力のオーバーヘッド、推論プロセスのピーク RSS |
 | `fmbench bench accuracy` | 精度: 内蔵タスク群(算数・知識・推論・指示追従・分類・抽出・翻訳・日本語・要約・コード)を自動採点。`--tasks file.jsonl` で独自タスク |
+| `fmbench bench all` | speed → accuracy → probe tokens → probe context を一括実行。`--submit` で最後に送信、`--skip-context` で最も遅い context を省略、`--force` で上書き |
 | `fmbench probe context` | コンテキスト長の実測(`exceededContextWindowSize` を二分探索) |
 | `fmbench probe tokens` | トークナイザ挙動: 英語/日本語/コード/数字/16進の chars/token を実測 |
 | `fmbench run "<prompt>"` | 1 プロンプトをストリーミング実行して計測値を表示 |
@@ -143,8 +150,7 @@ python3 -m http.server 8000   # リポジトリのルートで
 open http://localhost:8000/
 ```
 
-他の人にベンチを取ってもらう流れ: `install.sh` で `fmbench` を入れる → `fmbench bench speed`(必要なら accuracy / probe も)→
-`fmbench submit`。送られた Issue は [ingest-results](.github/workflows/ingest-results.yml) ワークフローが
+他の人にベンチを取ってもらう流れ: 上の `curl ... | sh` を 1 行送るだけです(インストール → `bench all --submit`)。送られた Issue は [ingest-results](.github/workflows/ingest-results.yml) ワークフローが
 `scripts/ingest.py` で `benchmarks.json` にマージし、Pull Request を開きます(メンテナがマージ)。
 
 ## リリース(メンテナ向け)
@@ -154,7 +160,7 @@ open http://localhost:8000/
 `fmbench-macos-arm64.tar.gz` を GitHub Release に添付します(`install.sh` はこれを取得します)。
 
 ```sh
-git tag v0.3.0 && git push origin v0.3.0
+git tag v0.3.2 && git push origin v0.3.2
 ```
 
 ## 独自タスク(JSONL)

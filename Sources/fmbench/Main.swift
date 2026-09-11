@@ -11,6 +11,7 @@ struct FMBench: AsyncParsableCommand {
           info            Model / runtime attributes (availability, languages, versions, memory footprint)
           bench speed     Latency & throughput benchmark (TTFT, decode tok/s, prefill, structured output)
           bench accuracy  Built-in task suite scored automatically (or your own JSONL tasks)
+          bench all       speed + accuracy + probe tokens + probe context in one go (--submit to share)
           probe context   Empirically find the context-window limit
           probe tokens    Estimate chars-per-token for several text types (tokenizer behaviour)
           run             Run one prompt and print timing stats
@@ -24,7 +25,7 @@ struct FMBench: AsyncParsableCommand {
 struct Bench: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "Benchmarks (speed / accuracy).",
-        subcommands: [Speed.self, Accuracy.self]
+        subcommands: [Speed.self, Accuracy.self, All.self]
     )
 }
 
