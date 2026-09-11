@@ -66,7 +66,14 @@ jobs:
           else
             body=$(printf 'Adds the result posted in #%s by @%s.\n\n%s\n\nCloses #%s' \
               "$ISSUE" "${{ github.event.issue.user.login }}" "$(cat /tmp/summary.md)" "$ISSUE")
-            url=$(gh pr create --base main --head "$branch" \
-              --title "${{ github.event.issue.title }}" --body "$body")
-            gh issue comment "$ISSUE" --body "Thanks! Your result is queued for review in $url and will appear in the comparison table once merged."
+            if url=$(gh pr create --base main --head "$branch" \
+                 --title "${{ github.event.issue.title }}" --body "$body" 2>/tmp/pr-error.txt); then
+              gh issue comment "$ISSUE" --body "Thanks! Your result is queued for review in $url and will appear in the comparison table once merged."
+            else
+              # Most likely "GitHub Actions is not permitted to create or approve pull requests":
+              # Settings > Actions > General > Workflow permissions > allow GitHub Actions to create PRs.
+              compare="https://github.com/${{ github.repository }}/compare/main...$branch?expand=1"
+              gh issue comment "$ISSUE" --body "Thanks! Your result was merged into branch \`$branch\`, but I could not open the pull request automatically ($(head -c 300 /tmp/pr-error.txt)). @${{ github.repository_owner }} can open it here: $compare"
+              exit 1
+            fi
           fi
